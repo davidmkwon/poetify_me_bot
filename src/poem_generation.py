@@ -29,7 +29,7 @@ def clean_corpus(corpus):
     return corpus_new
 
 def generate_CFD(corpus):
-    bigram = nltk.bigrams(CORPUS)
+    bigram = nltk.bigrams(corpus)
     return nltk.ConditionalFreqDist(bigram)
 
 def generate_poem(num_words):
