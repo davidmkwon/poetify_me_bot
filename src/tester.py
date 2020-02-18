@@ -1,4 +1,6 @@
 import poem_generation
+import pronouncing
+import random
 
-print(poem_generation.clean_corpus(['According']))
-print(poem_generation.generate_poem(10))
+poem = poem_generation.generate_raw_naive_poem(10)
+print (poem)
