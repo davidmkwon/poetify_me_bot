@@ -8,7 +8,8 @@ from pronouncing import rhymes
 CORPUS = nltk.corpus.gutenberg.words('austen-emma.txt')
 
 def clean_corpus(corpus):
-    filter_words = [':',',','"', '-', "'", 'austen', 'jane', '1816', 'ii', 's']
+    filter_words = [':',',','"', '-', "'", 'austen', 'jane', '1816', 'ii', 's', '),'
+            , ',--']
     trail_words = ['--', '"', '_', ']', '[', "'"]
     corpus_new = []
     for word in corpus:
@@ -42,15 +43,15 @@ def generate_raw_naive_poem(num_words):
     CFD = generate_CFD(CORPUS_CLEAN)
     word = random.choice(CORPUS_CLEAN)
 
-    validFirstWordPOS = ['NN', 'NNS', 'NNP', 'NNPS']
+    valid_first_word_POS = ['NN', 'NNS', 'NNP', 'NNPS']
     while True:
         POS_tag = nltk.pos_tag([word])
-        if POS_tag[0][1] in validFirstWordPOS:
+        if POS_tag[0][1] in valid_first_word_POS:
             break
         word = random.choice(CORPUS_CLEAN)
 
     for i in range(num_words):
-        if word in CFD: # this conditional can also be modified so the loop does not end early
+        if word in CFD:
             poem += (word + ' ')
             word = random.choice(list(CFD[word].keys()))
         else:
@@ -58,26 +59,72 @@ def generate_raw_naive_poem(num_words):
 
     return poem
 
-def generate_raw_poem(words_per_line, height):
-    poem = [['' for i in range(words_per_line)] for j in range(height)]
+def find_random_first_word(corpus):
+    valid_first_word_POS = ['NN', 'NNS', 'NNP', 'NNPS']
+    word = random.choice(corpus)
+    LIMIT = 100
+    for i in range(LIMIT):
+        POS_tag = nltk.pos_tag([word])
+        if POS_tag[0][1] in valid_first_word_POS:
+            break
+        word = random.choice(corpus)
+        if i == LIMIT - 1:
+            raise Error('Cannot locate a valid word')
+    
+    return word
+
+def generate_raw_poem(words_per_line = 10, height = 4):
+    if height % 2 != 0:
+        raise InputError('Height value must be even.')
+
+    poem = [[] for i in range(height)]
     CORPUS_CLEAN = clean_corpus(CORPUS)
     CFD = generate_CFD(CORPUS_CLEAN)
-    word = random.choice(CORPUS_CLEAN) # potentially improve this so it's not an adjective or verb
+    word = find_random_first_word(CORPUS_CLEAN)
     
+    invalid_end_word_POS = ['IN', 'WDT', 'DT', 'CC']
+    sentence_count = words_per_line * height / 2 # assume default ABAB rhyme scheme
+    current_word_count = 0
+    row_num = 0
+    
+    for i in range(height // 2):
+        while current_word_count < sentence_count:
+            if word in CFD:
+                poem[row_num].append(word)
+                word = random.choice(list(CFD[word].keys()))
+                current_word_count += 1
+                
+                if current_word_count == sentence_count // 2:
+                    row_num += 1 
+                    print('half sentence now')
+                
+                if current_word_count == sentence_count:
+                    print('full sentence now')
+                    if poem[row_num][-1] in invalid_end_word_POS:
+                        
+                        original_word = word
+                        while poem[row_num][-1] not in invalid_end_word_POS:
+                            for each_word in list(CFD[poem[row_num][-1]].keys()):
+                                if each_word not in invalid_end_word_POS:
+                                    word = each_word
+                                    poem[row_num].append(word)
+                                    break
+                            
+                            if word == original_word:
+                                word = random.choice(list(CFD[poem[row_num][-1]].keys()))
+                                poem[row_num].append(word)
+                    
+                    current_word_count = 0
+                    row_num += 1
+                    word = find_random_first_word(CORPUS_CLEAN)
+                    break
+            
+            else:
+                reverse_count = Math.log(sentence_count)
+                current_word_count -= reverse_count # make sure this doesn't overlap into previous row
+                word = poem[row_num][-reverse_count]
+
     return poem
-    '''
-    for j in range(height):
-        for i in range(words_per_line):
-            poem[j][i] = word
-            if len(list(CFD[word].keys())) > 1:
-                original_word = word
-                while True:
-                    word = random.choice(list(CFD[original_word].keys()))
-                    if word in CFD:
-                        break
-            elif len(CFD[word].keys() == 1:
-                word = list(CFD[word].keys())[0]
-    '''
 
 # def rhyme_poem(poem):
 
