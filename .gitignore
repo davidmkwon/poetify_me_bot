@@ -3,3 +3,5 @@
 *.swp
 .installed.cfg
 *~
+.DS_Store
+*.txt

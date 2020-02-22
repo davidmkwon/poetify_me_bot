@@ -4,14 +4,22 @@ import nltk
 from nltk.corpus import wordnet
 from pronouncing import rhymes
 
-# The text from the gutenberg library that will be useD
-CORPUS = nltk.corpus.gutenberg.words('austen-emma.txt')
+CORPUS = open("6524-8.txt", "r", encoding="ISO-8859-1").read()
+# CORPUS = ''.join([i for i in CORPUS if not i.isdigit()]).split(' ')
+# CORPUS = ''.join([i for i in CORPUS if not i.isdigit()]).replace("\n\n", " "w
+# CORPUS = nltk.corpus.gutenberg.words('austen-emma.txt')
 
 def clean_corpus(corpus):
-    filter_words = [':',',','"', '-', "'", 'austen', 'jane', '1816', 'ii', 's', '),'
-            , ',--']
-    trail_words = ['--', '"', '_', ']', '[', "'"]
+    #filter and trail words to cut out
+    filter_words = [':',',','"', '-', "'", 's', '),' ,',--']
+    trail_words = ['--', '"', '_', ']', '[', "'", '__']
     corpus_new = []
+    
+    #filer out line breaks
+    corpus = corpus.replace('\n\n', ' ')
+    corpus = corpus.replace('\n', ' ')
+    corpus = corpus.split(' ')
+
     for word in corpus:
         clean_word = word.lower()
 
@@ -28,10 +36,16 @@ def clean_corpus(corpus):
 
         if clean_word == ';':
             clean_word = '.'
-        
-        if clean_word not in filter_words and len(clean_word) != 0:
+
+        if clean_word not in filter_words and word and not clean_word.isdigit():
             corpus_new.append(clean_word)
+    
     return corpus_new
+
+def print_corpus():
+    corpus_clean = clean_corpus(CORPUS)
+    for word in corpus_clean:
+        print(word),
 
 def generate_CFD(corpus):
     bigram = nltk.bigrams(corpus)
@@ -41,14 +55,7 @@ def generate_raw_naive_poem(num_words):
     poem = ''
     CORPUS_CLEAN = clean_corpus(CORPUS)
     CFD = generate_CFD(CORPUS_CLEAN)
-    word = random.choice(CORPUS_CLEAN)
-
-    valid_first_word_POS = ['NN', 'NNS', 'NNP', 'NNPS']
-    while True:
-        POS_tag = nltk.pos_tag([word])
-        if POS_tag[0][1] in valid_first_word_POS:
-            break
-        word = random.choice(CORPUS_CLEAN)
+    word = find_random_first_word(CORPUS_CLEAN)
 
     for i in range(num_words):
         if word in CFD:
@@ -96,10 +103,8 @@ def generate_raw_poem(words_per_line = 10, height = 4):
                 
                 if current_word_count == sentence_count // 2:
                     row_num += 1 
-                    print('half sentence now')
                 
                 if current_word_count == sentence_count:
-                    print('full sentence now')
                     if poem[row_num][-1] in invalid_end_word_POS:
                         
                         original_word = word
@@ -130,9 +135,6 @@ def generate_raw_poem(words_per_line = 10, height = 4):
 
 
 '''
-Break cases:
-somtimes the entire poem is empty
-
 Steps for forward-bigram construction
 1. generate forward bigram of entire gutenberg text
 2. create ConditionalFreqDist

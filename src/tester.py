@@ -1,6 +1,6 @@
 import poem_generation
 import pronouncing
 import random
+import nltk
 
-poem = poem_generation.generate_raw_poem(10, 4)
-print (poem)
+print(poem_generation.print_corpus())
