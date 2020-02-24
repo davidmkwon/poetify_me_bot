@@ -6,13 +6,12 @@ from pronouncing import rhymes
 
 CORPUS = open("6524-8.txt", "r", encoding="ISO-8859-1").read()
 # CORPUS = ''.join([i for i in CORPUS if not i.isdigit()]).split(' ')
-# CORPUS = ''.join([i for i in CORPUS if not i.isdigit()]).replace("\n\n", " "w
 # CORPUS = nltk.corpus.gutenberg.words('austen-emma.txt')
 
 def clean_corpus(corpus):
     #filter and trail words to cut out
     filter_words = [':',',','"', '-', "'", 's', '),' ,',--']
-    trail_words = ['--', '"', '_', ']', '[', "'", '__']
+    trail_words = ['--', '"', '_', ']', '[', "'", '__', ',']
     corpus_new = []
     
     #filer out line breaks
@@ -41,11 +40,6 @@ def clean_corpus(corpus):
             corpus_new.append(clean_word)
     
     return corpus_new
-
-def print_corpus():
-    corpus_clean = clean_corpus(CORPUS)
-    for word in corpus_clean:
-        print(word),
 
 def generate_CFD(corpus):
     bigram = nltk.bigrams(corpus)
