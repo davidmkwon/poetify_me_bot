@@ -151,8 +151,6 @@ def generate_raw_poem(words_per_line = 10, height = 4):
 
     return poem
 
-
-
 # def rhyme_poem(poem):
 
 
