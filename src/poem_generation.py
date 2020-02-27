@@ -1,4 +1,4 @@
-# Used modules
+# Used libaries
 import random
 import math
 import nltk
@@ -6,12 +6,10 @@ from nltk.corpus import wordnet
 from pronouncing import rhymes
 
 CORPUS = open("6524-8.txt", "r", encoding="ISO-8859-1").read()
-# CORPUS = nltk.corpus.gutenberg.words('austen-emma.txt')
+FILTER_WORDS = [':',',','"', '-', "'", 's', '),' ,',--']
+TRAIL_WORDS = ['--', '"', '_', ']', '[', "'", '__', ',']
 
 def clean_corpus(corpus):
-    #filter and trail words to cut out
-    filter_words = [':',',','"', '-', "'", 's', '),' ,',--']
-    trail_words = ['--', '"', '_', ']', '[', "'", '__', ',']
     corpus_new = []
     
     #filer out line breaks
@@ -45,21 +43,6 @@ def generate_CFD(corpus):
     bigram = nltk.bigrams(corpus)
     return nltk.ConditionalFreqDist(bigram)
 
-def generate_raw_naive_poem(num_words):
-    poem = ''
-    CORPUS_CLEAN = clean_corpus(CORPUS)
-    CFD = generate_CFD(CORPUS_CLEAN)
-    word = find_random_first_word(CORPUS_CLEAN)
-
-    for i in range(num_words):
-        if word in CFD:
-            poem += (word + ' ')
-            word = random.choice(list(CFD[word].keys()))
-        else:
-            break
-
-    return poem
-
 def POS(word):
     word_POS = nltk.pos_tag([word])
     return word_POS[0][1]
@@ -76,6 +59,21 @@ def find_random_first_word(corpus):
             raise Error('Cannot locate a valid word')
     
     return word
+
+def generate_raw_naive_poem(num_words):
+    poem = ''
+    CORPUS_CLEAN = clean_corpus(CORPUS)
+    CFD = generate_CFD(CORPUS_CLEAN)
+    word = find_random_first_word(CORPUS_CLEAN)
+
+    for i in range(num_words):
+        if word in CFD:
+            poem += (word + ' ')
+            word = random.choice(list(CFD[word].keys()))
+        else:
+            break
+
+    return poem
 
 def generate_raw_poem(words_per_line = 10, height = 4):
     if height % 2 != 0:
