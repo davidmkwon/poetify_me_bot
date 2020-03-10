@@ -1,9 +1,8 @@
 # Used libraries
-import poem_generation
-import poem_generation2
+from poem_generation import *
 import pronouncing
 import random
-import nltk
+from nltk.corpus import wordnet as wn
 
 '''
 for i in range(5):
@@ -24,7 +23,14 @@ for i in range(5):
     print('\nNEXT POEM\n')
 '''
 
-poem_rhyme = poem_generation.generate_raw_poem()
+poem_rhyme = rhyme_poem(generate_raw_poem())
+
+for line in poem_rhyme:
+    print('\n NEW LINE \n')
+    for word in line:
+        print(word)
+
+'''
 for line in poem_rhyme:
     string = ''
     for word in line:
@@ -32,3 +38,4 @@ for line in poem_rhyme:
         word_POS = word_POS[0][1]
         string += (word + ' ' + '(' + word_POS + ')')
     print (string)
+'''

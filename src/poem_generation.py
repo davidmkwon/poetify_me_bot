@@ -3,7 +3,7 @@ import random
 import math
 import nltk
 from nltk.corpus import wordnet
-from pronouncing import rhymes
+import pronouncing
 
 CORPUS = open("6524-8.txt", "r", encoding="ISO-8859-1").read()
 FILTER_WORDS = [':',',','"', '-', "'", 's', '),' ,',--']
@@ -20,7 +20,7 @@ def clean_corpus(corpus):
     for word in corpus:
         clean_word = word.lower()
 
-        for trail_word in trail_words:
+        for trail_word in TRAIL_WORDS:
             size = len(trail_word)
             try:
                 if clean_word[0 : size] == trail_word:
@@ -34,7 +34,7 @@ def clean_corpus(corpus):
         if clean_word == ';':
             clean_word = '.'
 
-        if clean_word not in filter_words and word and not clean_word.isdigit():
+        if clean_word not in FILTER_WORDS and word and not clean_word.isdigit():
             corpus_new.append(clean_word)
     
     return corpus_new
@@ -99,18 +99,24 @@ def generate_raw_poem(words_per_line = 10, height = 4):
 
                 # case where the word added has a period ending
                 if poem[row][-1][-1] == '.':
+
                     # if this ending is too quick, then randomly pick another word to continue with
                     if current_word_count < sentence_count - int(math.log(sentence_count)):
                         poem[row].pop()
                         print(len(poem[row]))
+                        print('next iteration')
 
                         try:
                             last_word = poem[row][-1]
                         except:
                             last_word = find_random_first_word(CORPUS_CLEAN)
 
-                        word = random.choice(list(CFD[last_word].keys()))
+                        if CFD[last_word].keys():
+                            word = random.choice(list(CFD[last_word].keys()))
+                        else:
+                            word = find_random_first_word
                         current_word_count -= 1
+
                     # if this ending is not too quick, then exit this loop and begin the next sentence
                     else:
                         current_word_count = 0
@@ -149,21 +155,45 @@ def generate_raw_poem(words_per_line = 10, height = 4):
 
     return poem
 
-# def rhyme_poem(poem):
+def rhyme_poem(poem):
+    # initial check if poem is already rhyming
+    end_word_1 = poem[0][-1]
+    end_word_2 = poem[1][-1]
+    end_words = [end_word_1, end_word_2]
+
+    if end_word_1 in pronouncing.rhymes(end_word_2) or end_word_2 in pronouncing.rhymes(end_word_1):
+        return poem
+
+    for i in range(2): 
+
+        synonyms = []
+        for each_syn in wordnet.synsets(end_words[1 - i]): #end_words[1 - i]
+            for lemma in each_syn.lemmas():
+                synonyms.append(lemma.name())
+
+        rhymes = pronouncing.rhymes(end_words[i]) #end_words[i]
+        for rhyme in rhymes:
+            if rhyme in synonyms:
+                poem[1 - i][-1] = rhyme #poem[1 - i][-1]
+                return poem
+
+        pos_end_word = POS(end_words[1 - i]) #end_words[1 - i]
+
+        for rhyme in rhymes:
+            if POS(rhyme) == pos_end_word:
+                poem[1 - i][-1] = rhyme #end_word[1 - i]
+                return poem
+
+    # none of the above tactics worked, just replace the 2nd end word with a random rhyming word, or vice versa
+    for i in range(2):
+        rhymes = pronouncing.rhymes(end_words[i])
+        if rhymes:
+            random_rhyme = random.choice(rhymes)
+            poem[1 - i][-1] = random_rhyme
+
+    return poem
 
 
-'''
-Steps for forward-bigram construction
-1. generate forward bigram of entire gutenberg text
-2. create ConditionalFreqDist
-3. let's say poem is 4 lines --> generate 20-28 words
-4. rhyme (ABAB scheme):
-    a) first check if the poem is already in ABAB scheme (it probably isn't)
-    b) if not, find all rhymes of the first last word
-    c) check if any of these rhymes are synonyms of the third last word --> we want to
-    maintain original meaning as much as possible
-    d) if there are none, then pick a synonym that has the same POS (part of speech)
-    as the third last word
-    e) repeat for lines 2 and 4
-5. make first word be a synonym of the user inputted word
-'''
+
+
+
