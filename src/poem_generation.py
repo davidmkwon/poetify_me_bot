@@ -10,6 +10,12 @@ FILTER_WORDS = [':',',','"', '-', "'", 's', '),' ,',--']
 TRAIL_WORDS = ['--', '"', '_', ']', '[', "'", '__', ',']
 
 def clean_corpus(corpus):
+    '''
+    This method takes in some body of text, and filters out of the corpus
+    all filter words and trail words defined in this file. The method returns
+    a list of the "cleaned" words from the parameter corpus
+    '''
+
     corpus_new = []
     
     #filer out line breaks
@@ -40,14 +46,32 @@ def clean_corpus(corpus):
     return corpus_new
 
 def generate_CFD(corpus):
+    '''
+    This method creates and returns a Conditional Frequency Distribution
+    using nltk's ConditionalFreqDist function. The CFD is generated using
+    a constructed bigram of the parameter corpus
+    '''
+
     bigram = nltk.bigrams(corpus)
     return nltk.ConditionalFreqDist(bigram)
 
 def POS(word):
+    '''
+    This method returns the part of speech of a word, relying on nltk's
+    pos_tag library.
+    '''
+
     word_POS = nltk.pos_tag([word])
     return word_POS[0][1]
 
 def find_random_first_word(corpus):
+    '''
+    This method returns a random word from the parameter corpus, given some
+    conditions: first, the word must be "valid", meaning it's part of speech is
+    one of those listed below; second, the word must be chosed within some limit.
+    If the limit is exceeded, a word is chosen from random.
+    '''
+
     valid_first_word_POS = ['NN', 'NNS', 'NNP', 'NNPS']
     word = random.choice(corpus)
     LIMIT = 100
@@ -56,11 +80,17 @@ def find_random_first_word(corpus):
             break
         word = random.choice(corpus)
         if i == LIMIT - 1:
-            raise Error('Cannot locate a valid word')
+            return random.choise(corpus)
     
     return word
 
 def generate_raw_naive_poem(num_words):
+    '''
+    This method generates a random poem using a simple markov chaining method
+    based off the CFD of a corpus. This method is not used anymore, rather was
+    written for testing purposes.
+    '''
+
     poem = ''
     CORPUS_CLEAN = clean_corpus(CORPUS)
     CFD = generate_CFD(CORPUS_CLEAN)
@@ -76,6 +106,14 @@ def generate_raw_naive_poem(num_words):
     return poem
 
 def generate_raw_poem(words_per_line = 10, height = 4):
+    '''
+    This method generates a random, raw poem. This entails that the some randomly
+    generated sequence of words (most likely two sentences) will be generated and
+    returned as a 2D array (list of lists). This method uses a simple markov chaining
+    method based off the CFD of a corpus. There are many steps the method takes to ensure
+    that the generated poem will be valid.
+    '''
+
     if height % 2 != 0:
         raise InputError('Height value must be even.')
 
@@ -104,7 +142,7 @@ def generate_raw_poem(words_per_line = 10, height = 4):
                     if current_word_count < sentence_count - int(math.log(sentence_count)):
                         poem[row].pop()
                         print(len(poem[row]))
-                        print('next iteration')
+                        print('next iteration') 
 
                         try:
                             last_word = poem[row][-1]
@@ -114,7 +152,8 @@ def generate_raw_poem(words_per_line = 10, height = 4):
                         if CFD[last_word].keys():
                             word = random.choice(list(CFD[last_word].keys()))
                         else:
-                            word = find_random_first_word
+                            word = find_random_first_word()
+
                         current_word_count -= 1
 
                     # if this ending is not too quick, then exit this loop and begin the next sentence
@@ -156,6 +195,14 @@ def generate_raw_poem(words_per_line = 10, height = 4):
     return poem
 
 def rhyme_poem(poem):
+    '''
+    This method rhymes a poem. It takes a given poem (stored as a 2D array) and
+    first checks if the poem is already rhyming. If not, then the method will first
+    see if there are any synonyms of the 2nd last word that rhyme with the 1st last word.
+    If none, then the process will repeat for vice versa. Lastly, if this does not work,
+    the method will randomly pick a word that rhymes with the 1st last word.
+    '''
+
     # initial check if poem is already rhyming
     end_word_1 = poem[0][-1]
     end_word_2 = poem[1][-1]
