@@ -59,7 +59,7 @@ def generate_reply():
     poem_str_1 = ' '.join(word for word in poem[0])
     poem_str_2 = ' '.join(word for word in poem[1])
 
-    reply = 'A randomly generated poem, just for you: \n\n{}\n\n{}\n\nI am a bot. Summon me with {}'.format(poem_str_1, poem_str_2, bot_call)
+    reply = 'A randomly generated poem, just for you: \n\n"{}\n\n{}"\n\nI am a bot. Summon me with {}'.format(poem_str_1, poem_str_2, bot_call)
     return reply
 
 def reply_to_comment(comment):

@@ -5,7 +5,7 @@ import nltk
 from nltk.corpus import wordnet
 import pronouncing
 
-CORPUS = open("6524-8.txt", "r", encoding="ISO-8859-1").read()
+CORPUS = open("sbcorpus.txt", "r", encoding="ISO-8859-1").read()
 FILTER_WORDS = [':',',','"', '-', "'", 's', '),' ,',--']
 TRAIL_WORDS = ['--', '"', '_', ']', '[', "'", '__', ',']
 
@@ -72,9 +72,9 @@ def find_random_first_word(corpus):
     If the limit is exceeded, a word is chosen from random.
     '''
 
+    LIMIT = 100
     valid_first_word_POS = ['NN', 'NNS', 'NNP', 'NNPS']
     word = random.choice(corpus)
-    LIMIT = 100
     for i in range(LIMIT):
         if POS(word) in valid_first_word_POS:
             break
@@ -127,8 +127,11 @@ def generate_raw_poem(words_per_line = 10, height = 4):
     # assume use of default ABAB rhyme scheme
     sentence_count = words_per_line
     current_word_count = 0
+    LIMIT = 10
+    iteration = 0 # used for the limit counter
+    row = 0
 
-    for row in range(height//2):
+    while row < height // 2:
         while current_word_count < sentence_count:
             if word in CFD:
                 poem[row].append(word)
@@ -142,7 +145,7 @@ def generate_raw_poem(words_per_line = 10, height = 4):
                     if current_word_count < sentence_count - int(math.log(sentence_count)):
                         poem[row].pop()
                         print(len(poem[row]))
-                        print('next iteration') 
+                        print('next iteration')
 
                         try:
                             last_word = poem[row][-1]
@@ -152,9 +155,18 @@ def generate_raw_poem(words_per_line = 10, height = 4):
                         if CFD[last_word].keys():
                             word = random.choice(list(CFD[last_word].keys()))
                         else:
-                            word = find_random_first_word()
+                            word = find_random_first_word(CORPUS_CLEAN)
 
                         current_word_count -= 1
+                        iteration += 1
+                        
+                        if iteration == LIMIT:
+                            # restart the entire function
+                            current_word_count = 0
+                            iteration = 0
+                            poem = [[] for i in range(height//2)]
+                            word = find_random_first_word(CORPUS_CLEAN)
+
 
                     # if this ending is not too quick, then exit this loop and begin the next sentence
                     else:
@@ -191,6 +203,8 @@ def generate_raw_poem(words_per_line = 10, height = 4):
                 for i in range(reverse_count):
                     poem.pop()
                 word = poem[row][-1]
+
+        row += 1
 
     return poem
 
@@ -239,8 +253,3 @@ def rhyme_poem(poem):
             poem[1 - i][-1] = random_rhyme
 
     return poem
-
-
-
-
-

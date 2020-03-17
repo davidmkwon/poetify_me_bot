@@ -4,7 +4,4 @@
 .installed.cfg
 *~
 .DS_Store
-*.txt
-!requirements.txt
-!runtime.txt
 config.py
