@@ -6,3 +6,4 @@ Note that files that interact with Reddit via PRAW API are temporarily hidden in
 # screenshots
 
 ![Alt text](res/sample.jpg?raw=true "Title")
+![Alt text](res/reddit_screenshot.jpg?raw=true "Title)
