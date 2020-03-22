@@ -144,8 +144,8 @@ def generate_raw_poem(words_per_line = 10, height = 4):
                     # if this ending is too quick, then randomly pick another word to continue with
                     if current_word_count < sentence_count - int(math.log(sentence_count)):
                         poem[row].pop()
-                        print(len(poem[row]))
-                        print('next iteration')
+                        # print(len(poem[row]))
+                        # print('next iteration')
 
                         try:
                             last_word = poem[row][-1]
@@ -175,10 +175,10 @@ def generate_raw_poem(words_per_line = 10, height = 4):
                         break
 
                 if current_word_count == sentence_count:
-                    print('The end word right now is ', poem[row][-1])
+                    # print('The end word right now is ', poem[row][-1])
 
                     if POS(poem[row][-1]) in invalid_end_word_POS:
-                        print('there is an invalid ending right now')
+                        # print('there is an invalid ending right now')
                         
                         while POS(poem[row][-1]) in invalid_end_word_POS:
                             original_word = word
@@ -186,7 +186,7 @@ def generate_raw_poem(words_per_line = 10, height = 4):
                                 if POS(each_word) not in invalid_end_word_POS:
                                     word = each_word
                                     poem[row].append(word)
-                                    print('I have found the valid word ', each_word)
+                                    # print('I have found the valid word ', each_word)
                                     break
 
                             if word == original_word:

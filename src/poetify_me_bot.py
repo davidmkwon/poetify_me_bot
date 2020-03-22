@@ -3,13 +3,20 @@ import config
 import praw
 from poem_generation import generate_raw_poem, rhyme_poem
 
-reddit = praw.Reddit(user_agent=config.USER_AGENT,
-                            client_id=config.CLIENT_ID,
-                            client_secret=config.CLIENT_SECRET,
-                            username=config.USERNAME,
-                            password=config.PASSWORD)
+USER_AGENT = os.environ['user_agent']
+CLIENT_ID = os.environ['client_id']
+CLIENT_SECRET = os.environ['client_secret']
+USERNAME = os.environ['r_username']
+PASSWORD = os.environ['r_password']
 
-monitor_subreddits = ['testingground4bots']
+reddit = praw.Reddit(user_agent=USER_AGENT,
+                    client_id=CLIENT_ID,
+                    client_secret=CLIENT_SECRET,
+                    username=USERNAME,
+                    password=PASSWORD)
+
+monitor_subreddits_test = ['testingground4bots']
+monitor_subreddits = ['tifu', 'nextfuckinglevel', 'TIHI']
 
 bot_call = 'u/poetify_me_bot'
 
@@ -79,11 +86,4 @@ def reply_to_comment(comment):
 
 if __name__ == "__main__":
     run()
-
-
-
-
-
-
-
 
