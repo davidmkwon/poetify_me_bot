@@ -1,7 +1,5 @@
 # poetify_me_bot
-A reddit bot that responds to its mentions with a generated poem for the specified category
-
-Note that files that interact with Reddit via PRAW API are temporarily hidden in .gitingore as they contain sensitive information
+poetify_me_bot is a Reddit bot that responds to user mentions with an algorithmically generated random poem. The bot interacts with Reddit via PRAW and makes use of `nltk` and `pronouncing` for poem generation.
 
 # screenshots
 
